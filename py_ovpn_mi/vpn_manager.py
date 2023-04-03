@@ -56,7 +56,7 @@ class VPNManager:
         result = ""
         try:
             while True:
-                a: bytes = asyncio.wait_for(
+                a: bytes = await asyncio.wait_for(
                     self._stream_reader.read(1024), timeout=self._timeout_read
                 )
                 result += a.decode()
