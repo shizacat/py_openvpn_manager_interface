@@ -6,19 +6,16 @@ from .model import OVInfo, CmdResponse
 
 class VPNManager:
 
-    # default_timeout = 5  # seconds
-
     def __init__(
         self,
         host: Optional[str] = None,
         port: Optional[int] = None,
         unix_socket: Optional[str] = None,
-        timeout: Optional[int] = None,
     ):
         self._host = host
         self._port = port
         self._unix_socket = unix_socket
-        # self._timeout = timeout or self.default_timeout
+        self._timeout_read = 1  # second
 
         self._stream_reader: asyncio.StreamReader = None
         self._stream_writer: asyncio.StreamWriter = None
@@ -39,9 +36,7 @@ class VPNManager:
 
         self._stream_writer.write(command.encode())
         await self._stream_writer.drain()
-
-        response = await self._stream_reader.read(-1)
-        return response.decode()
+        return await self._read()
 
     async def connect(self):
         if self._unix_socket is not None:
@@ -53,6 +48,21 @@ class VPNManager:
                 self._host, self._port
             )
         self._stream_reader, self._stream_writer = reader, writer
+
+        # read hello
+        await self._read()
+
+    async def _read(self):
+        result = ""
+        try:
+            while True:
+                a: bytes = asyncio.wait_for(
+                    self._stream_reader.read(1024), timeout=self._timeout_read
+                )
+                result += a.decode()
+        except asyncio.exceptions.TimeoutError:
+            pass
+        return result
 
     async def close(self):
         self._stream_writer.close()
@@ -67,7 +77,7 @@ class VPNManager:
         Virtual Address, Virtual IPv6 Address, Username, Client ID, Peer ID.
         Future versions may extend the number of fields.
         """
-        return OVInfo.create_from_str(await self.send_command("status 2"))
+        return OVInfo.create_from_str(await self.send_command("status 2\n"))
 
     async def cmd_kill(self, common_name: str) -> CmdResponse:
         """Send kill command to openvpn management interface
@@ -76,7 +86,7 @@ class VPNManager:
         SUCCESS: common name 'd.test' found, 1 client(s) killed
 
         """
-        answer = await self.send_command(f"kill {common_name}")
+        answer = await self.send_command(f"kill {common_name}\n")
 
         answer = answer.strip()
         if answer.startswith("SUCCESS:"):
