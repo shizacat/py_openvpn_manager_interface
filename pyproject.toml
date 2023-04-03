@@ -1,0 +1,28 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "py_ovpn_mi"
+version = "1.0.0"
+authors = [
+  { name="Alexey Matveev", email="" },
+]
+description = "Python library interaction with openVPN manager interface"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "License :: OSI Approved :: MIT License",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/shizacat/py_openvpn_manager_interface"
+
+[tool.hatch.build]
+exclude = [
+  "tests/*",
+]
