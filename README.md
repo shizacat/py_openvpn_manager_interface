@@ -2,6 +2,7 @@
 
 Futures:
 - Async
+- Support tcp/unix_socket connection. ("unix:///path_socket", "tcp://host:port")
 
 # Example
 
@@ -11,7 +12,7 @@ import asyncio
 from py_ovpn_mi import VPNManager
 
 async def main():
-    a = VPNManager(host="127.0.0.1", port=80)
+    a = VPNManager(url="tcp://127.0.0.1:80")
     await a.connect()
 
 asyncio.run(main())

@@ -6,7 +6,7 @@ from py_ovpn_mi import VPNManager
 
 class TestVpnManager(unittest.IsolatedAsyncioTestCase):
     async def test_cmd_kill(self):
-        obj = VPNManager(host="127.0.0.1", port=1234)
+        obj = VPNManager(url="tcp://127.0.0.1:1234")
 
         with self.subTest("Unknown"):
             obj.send_command = AsyncMock(return_value="")
@@ -26,3 +26,16 @@ class TestVpnManager(unittest.IsolatedAsyncioTestCase):
             )
             r = await obj.cmd_kill("test")
             self.assertEqual(r.status, "ERROR")
+
+    def test__parse_url(self):
+        obj = VPNManager(url="tcp://127.0.0.1:1234")
+
+        with self.subTest("bad url"), self.assertRaises(ValueError):
+            obj._parse_url("1234")
+
+        with self.subTest("unix"):
+            obj._parse_url("unix:///test/file.socket")
+            self.assertEqual(obj._unix_socket, "/test/file.socket")
+
+        with self.subTest("unix"), self.assertRaises(ValueError):
+            obj._parse_url("unix://test/file.socket")

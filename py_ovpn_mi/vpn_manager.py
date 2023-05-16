@@ -1,26 +1,41 @@
+import os
 import asyncio
-from typing import Optional
+import urllib.parse as url_parser
 
 from .model import OVInfo, CmdResponse
 
 
 class VPNManager:
 
-    def __init__(
-        self,
-        host: Optional[str] = None,
-        port: Optional[int] = None,
-        unix_socket: Optional[str] = None,
-    ):
-        self._host = host
-        self._port = port
-        self._unix_socket = unix_socket
+    def __init__(self, url: str):
+        self._host = None
+        self._port = None
+        self._unix_socket = None
         self._timeout_read = 1  # second
 
         self._stream_reader: asyncio.StreamReader = None
         self._stream_writer: asyncio.StreamWriter = None
 
+        self._parse_url(url)
         self._check_connect()
+
+    def _parse_url(self, url: str):
+        """Parses the url and fills in the class fields
+
+        Raises:
+            ValueError
+        """
+        obj = url_parser.urlparse(url)
+        if obj.scheme == "unix":
+            if obj.netloc:
+                raise ValueError(
+                    "Wrong format for unix socket, need: unix:///...")
+            self._unix_socket = obj.path
+        elif obj.scheme == "tcp":
+            self._host = obj.hostname
+            self._port = obj.port
+        else:
+            raise ValueError(f"Schema not found: {obj.scheme}")
 
     def _check_connect(self):
         if (
