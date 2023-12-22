@@ -15,7 +15,7 @@ pip install ovpn-manager
 ```python
 import asyncio
 
-from py_ovpn_mi import VPNManager
+from ovpn_manager import VPNManager
 
 async def main():
     a = VPNManager(url="tcp://127.0.0.1:80")
