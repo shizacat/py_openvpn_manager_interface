@@ -4,6 +4,12 @@ Futures:
 - Async
 - Support tcp/unix_socket connection. ("unix:///path_socket", "tcp://host:port")
 
+# Install
+
+```bash
+pip install ovpn-manager
+```
+
 # Example
 
 ```python
