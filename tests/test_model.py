@@ -1,7 +1,7 @@
 import datetime
 import unittest
 
-from py_ovpn_mi import model
+from ovpn_manager import model
 
 
 class TestModel(unittest.TestCase):

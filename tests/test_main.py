@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import AsyncMock
 
-from py_ovpn_mi import VPNManager
+from ovpn_manager import VPNManager
 
 
 class TestVpnManager(unittest.IsolatedAsyncioTestCase):
